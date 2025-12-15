@@ -180,12 +180,21 @@ export class SefariaClient {
 
   /**
    * Parse Hebrew text and clean it
+   * Always use Hebrew (he) field, never English (text) field
    */
-  parseHebrewText(text: string | string[]): string[] {
-    if (Array.isArray(text)) {
-      return text.map((t) => this.cleanText(t))
+  parseHebrewText(response: any): string[] {
+    // Always prioritize Hebrew text over English
+    const hebrewText = response.he || response.text
+
+    if (Array.isArray(hebrewText)) {
+      // Handle nested arrays (like Talmud)
+      if (Array.isArray(hebrewText[0])) {
+        return hebrewText.flat().map((t) => this.cleanText(String(t))).filter(t => t.length > 0)
+      }
+      return hebrewText.map((t) => this.cleanText(String(t))).filter(t => t.length > 0)
     }
-    return [this.cleanText(text)]
+
+    return [this.cleanText(String(hebrewText))].filter(t => t.length > 0)
   }
 
   /**

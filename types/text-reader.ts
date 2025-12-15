@@ -1,6 +1,6 @@
 // Generic Text Reader Types - תומך בכל סוגי הטקסטים
 
-export type TextType = "tehilim" | "tanakh" | "talmud" | "tefilot" | "halacha" | "sefarim"
+export type TextType = "tehilim" | "tanakh" | "talmud" | "tefilot" | "halacha" | "sefarim" | "zohar" | "etz_chaim"
 
 export interface TextContent {
   id: string
@@ -215,6 +215,44 @@ export const TEXT_TYPES_CONFIG: Record<TextType, TextTypeConfig> = {
       dailyReading: false,
       wordByWord: false,
       statistics: false,
+      audioSupport: false,
+    },
+  },
+  zohar: {
+    type: "zohar",
+    title: "Zohar",
+    heTitle: "זוהר הקדוש",
+    icon: "✨",
+    color: "cyan",
+    sefariaEndpoint: "Zohar",
+    defaultBook: "Zohar",
+    totalSections: 1170, // Total dapim in Zohar
+    enabled: true,
+    description: "The Holy Zohar - Daily learning with 5 pages per day",
+    heDescription: "ספר הזוהר הקדוש - לימוד יומי 5 דפים ליום",
+    features: {
+      dailyReading: true,
+      wordByWord: true,
+      statistics: true,
+      audioSupport: false,
+    },
+  },
+  etz_chaim: {
+    type: "etz_chaim",
+    title: "Etz Chaim",
+    heTitle: "עץ חיים",
+    icon: "🌳",
+    color: "emerald",
+    sefariaEndpoint: "Etz Chaim",
+    defaultBook: "Etz Chaim",
+    totalSections: 50, // Total gates/shaarim
+    enabled: true,
+    description: "Etz Chaim - The Arizal's kabbalistic teachings",
+    heDescription: "ספר עץ חיים - כתבי האר\"י הקדוש",
+    features: {
+      dailyReading: false,
+      wordByWord: true,
+      statistics: true,
       audioSupport: false,
     },
   },
