@@ -1,30 +1,208 @@
-# Hebrew full-stack portfolio
+# אור הישרה - בלוג רוחני בעברית
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+פלטפורמת בלוג מלאה בעברית עם מערכת ניהול תוכן, תגובות, דירוגים ומעקב קריאת תהילים.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/aiagency/v0-hebrew-full-stack-portfolio)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/XH9YdLjrbz8)
+## 🚀 תכונות
 
-## Overview
+- **ניהול מאמרים מלא** - עורך TipTap עשיר עם תמיכה בטבלאות, תמונות, קוד ועוד
+- **מערכת תגובות** - עם מודרציה ותשובות מקוננות
+- **דירוגי מאמרים** - מערכת כוכבים 1-5
+- **קטגוריות ותגיות** - ארגון תוכן גמיש
+- **מעקב תהילים** - מערכת ייחודית למעקב אחר קריאת תהילים
+- **SEO מתקדם** - JSON-LD, RSS, Sitemap, Open Graph
+- **אימות משתמשים** - עם Supabase Auth
+- **מצב כהה/בהיר** - תמיכה מלאה ב-themes
+- **RTL נאטיבי** - עיצוב מלא בעברית מימין לשמאל
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## 📋 דרישות מקדימות
 
-## Deployment
+- Node.js 18+
+- npm או pnpm
+- חשבון Supabase (חינם)
 
-Your project is live at:
+## ⚙️ התקנה
 
-**[https://vercel.com/aiagency/v0-hebrew-full-stack-portfolio](https://vercel.com/aiagency/v0-hebrew-full-stack-portfolio)**
+### 1. שכפול הפרויקט
 
-## Build your app
+```bash
+git clone <repository-url>
+cd blog-for-articles
+```
 
-Continue building your app on:
+### 2. התקנת תלויות
 
-**[https://v0.dev/chat/projects/XH9YdLjrbz8](https://v0.dev/chat/projects/XH9YdLjrbz8)**
+```bash
+# אם אתה על Termux/Android:
+npm install --no-bin-links
 
-## How It Works
+# אחרת:
+npm install
+```
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+### 3. הגדרת משתני סביבה
+
+צור קובץ `.env` בשורש הפרויקט (או העתק מ-`.env.example`):
+
+```bash
+cp .env.example .env
+```
+
+ערוך את `.env` והוסף את פרטי Supabase שלך:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 4. הגדרת מסד הנתונים
+
+הרץ את הסקריפטים ב-`scripts/` לפי הסדר בפרוייקט Supabase שלך:
+
+1. `001-create-tables.sql` - יצירת טבלאות
+2. `002-seed-categories.sql` - קטגוריות ראשוניות
+3. `004-create-tags-table.sql` - טבלת תגיות
+4. `004-create-tehilim-cache.sql` - cache לתהילים
+5. `006-create-auth-tables.sql` - טבלאות אימות
+6. `009-optimize-rls-policies.sql` - מדיניות אבטחה
+7. `010-create-admin-user.sql` - משתמש admin (ערוך לפני הרצה!)
+8. `011-create-profile-avatars-bucket.sql` - bucket לתמונות פרופיל
+9. `015-create-article-images-bucket.sql` - bucket לתמונות מאמרים
+
+### 5. הרצת הפרויקט
+
+```bash
+# Development
+npm run dev
+
+# Production build
+npm run build
+npm start
+```
+
+האתר יהיה זמין ב-`http://localhost:3000`
+
+## 🏗️ מבנה הפרויקט
+
+```
+├── app/                    # Next.js App Router
+│   ├── admin/             # ממשק ניהול (מוגן)
+│   ├── articles/          # דפי מאמרים
+│   ├── auth/              # התחברות והרשמה
+│   ├── api/               # API routes
+│   └── middleware.ts      # ניהול session ואבטחה
+├── components/            # קומפוננטות React
+│   ├── admin/            # קומפוננטות ניהול
+│   ├── articles/         # קומפוננטות מאמרים
+│   ├── ui/               # shadcn/ui components
+│   └── ...
+├── lib/                   # פונקציות עזר
+│   ├── supabase/         # Supabase clients
+│   ├── queries.ts        # שאילתות DB
+│   └── seo.ts            # פונקציות SEO
+├── types/                 # TypeScript types
+└── scripts/              # SQL scripts למסד נתונים
+```
+
+## 🔐 אבטחה
+
+הפרויקט משתמש בגישה דו-שכבתית:
+
+1. **Middleware** (`middleware.ts`) - בודק אימות (authentication)
+2. **Layout Guards** - בודק הרשאות (authorization)
+
+מסלולים מוגנים:
+- `/admin/*` - דורש הרשאת admin/editor
+- `/profile` - דורש משתמש מחובר
+- `/settings` - דורש משתמש מחובר
+
+## 👨‍💻 פיתוח
+
+### הרצת Linter
+
+```bash
+npm run lint
+```
+
+### קונבנציות קוד
+
+- השתמש ב-TypeScript עבור כל הקבצים
+- עקוב אחר ESLint rules
+- קומפוננטות ב-PascalCase
+- פונקציות ב-camelCase
+- קבועים ב-UPPER_SNAKE_CASE
+
+### הוספת קומפוננטות UI חדשות
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+## 🗄️ Supabase
+
+### טבלאות עיקריות
+
+- `articles` - מאמרים
+- `categories` - קטגוריות
+- `comments` - תגובות
+- `ratings` - דירוגים
+- `tags` - תגיות
+- `profiles` - פרופילי משתמשים
+- `tehilim_progress` - מעקב תהילים
+
+### RLS Policies
+
+כל הטבלאות מוגנות ב-Row Level Security. ראה `scripts/009-optimize-rls-policies.sql`.
+
+## 📝 יצירת מאמר ראשון
+
+1. התחבר לאתר
+2. עבור ל-`/admin`
+3. לחץ על "מאמרים חדשים"
+4. מלא את הפרטים ושמור
+
+## 🌐 Deploy
+
+הפרויקט מוכן ל-deploy ב-Vercel:
+
+1. דחוף את הקוד ל-GitHub
+2. חבר ל-Vercel
+3. הוסף משתני סביבה ב-Vercel
+4. Deploy!
+
+זכור לעדכן את `NEXT_PUBLIC_SITE_URL` ל-URL של הייצור.
+
+## 🐛 בעיות נפוצות
+
+### "next: not found" על Termux
+הרץ: `npm install --no-bin-links`
+
+### שגיאות Session
+וודא ש-`middleware.ts` קיים ו-`NEXT_PUBLIC_SUPABASE_URL/KEY` מוגדרים.
+
+### TypeScript Errors בבנייה
+הפרויקט מוגדר עם `ignoreBuildErrors: true` - זה בכוונה אך מומלץ לתקן.
+
+## 📚 תיעוד נוסף
+
+ראה `CLAUDE.md` למידע טכני מפורט על הארכיטקטורה.
+
+## 🤝 תרומה
+
+1. Fork הפרויקט
+2. צור branch חדש (`git checkout -b feature/amazing-feature`)
+3. Commit השינויים (`git commit -m 'Add amazing feature'`)
+4. Push ל-branch (`git push origin feature/amazing-feature`)
+5. פתח Pull Request
+
+## 📄 רישיון
+
+הפרויקט הזה הוא קוד פתוח תחת רישיון MIT.
+
+## 💡 תמיכה
+
+לשאלות ותמיכה, פתח issue ב-GitHub.
+
+---
+
+**נבנה עם ❤️ בעברית**
