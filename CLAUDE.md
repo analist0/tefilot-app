@@ -205,3 +205,139 @@ The app uses Supabase auth with proper session management:
 5. **Path Alias**: The project uses `@/*` to reference root-level imports (tsconfig.json:22)
 
 6. **Deployment**: Originally built with v0.dev and deployed on Vercel with automatic sync from v0.dev deployments (see README.md)
+
+## Generic Text Reader System
+
+The application now includes a comprehensive text reader system that supports multiple types of Jewish texts with word-by-word reading, progress tracking, and statistics.
+
+### Supported Text Types
+
+1. **Tehilim** (תהילים) - Book of Psalms
+2. **Tanakh** (תנ״ך) - Complete Hebrew Bible (Torah, Neviim, Ketuvim)
+3. **Talmud** (תלמוד) - Talmud Bavli with Daf Yomi tracking
+4. **Tefilot** (תפילות) - Daily prayers and blessings
+5. **Halacha** (הלכה) - Daily Halacha and Jewish law
+6. **Sefarim** (ספרים) - Jewish books library with search
+
+### Architecture
+
+**Generic Components** (reusable for all text types):
+```
+components/reader/
+├── generic-text-reader.tsx    # Main reader component
+├── verse-display.tsx          # Word-by-word verse display
+├── reader-controls.tsx        # Playback controls (play/pause, speed, font)
+└── stats-display.tsx          # Statistics dashboard
+```
+
+**Text-Specific Pages**:
+```
+app/
+├── learn/page.tsx             # Main learning hub (shows all enabled types)
+├── tanakh/
+│   ├── page.tsx              # Book selection (Torah, Neviim, Ketuvim)
+│   ├── [book]/[chapter]/    # Chapter reader
+│   └── stats/page.tsx        # Statistics
+├── talmud/
+│   ├── page.tsx              # Tractate selection + Daf Yomi
+│   ├── [tractate]/[daf]/    # Daf reader (e.g., /talmud/Berakhot/2a)
+│   └── stats/page.tsx        # Statistics
+├── tehilim/                  # Existing Tehilim reader
+└── admin/content-settings/   # Enable/disable content types
+```
+
+### Data Flow
+
+**Sefaria API Integration**:
+- `lib/sefaria/client.ts` - Generic API client for fetching all text types
+- `lib/sefaria/tanakh.ts` - Tanakh book structure (24 books, chapters)
+- `lib/sefaria/talmud.ts` - Talmud tractates + Daf Yomi calculator
+
+**Progress Tracking**:
+- `lib/reader/progress-tracker.ts` - Generic progress tracking for all types
+- Dual storage: Supabase `reading_progress` table + localStorage backup
+- Tracks: section, verse, letter_index, reading speed (WPM), time, streaks
+
+**Database Schema**:
+```sql
+reading_progress table:
+- session_id (TEXT) - Anonymous session tracking
+- user_id (UUID) - Optional authenticated user
+- text_type (TEXT) - 'tehilim' | 'tanakh' | 'talmud' | 'tefilot' | 'halacha' | 'sefarim'
+- text_id (TEXT) - e.g., "Genesis.1", "Berakhot.2a", "Psalms.23"
+- section (INTEGER) - chapter/daf number
+- verse (INTEGER) - verse/line number
+- letter_index (INTEGER) - current word position
+- completed (BOOLEAN)
+- reading_speed_wpm (INTEGER)
+- total_time_seconds (INTEGER)
+- sections_completed, verses_read, current_streak_days, longest_streak_days
+```
+
+### Key Features
+
+**Word-by-Word Reading**:
+- Auto-advance with configurable speed (20-150 WPM)
+- Visual highlighting of current word
+- Font size control (18-40px)
+- Smooth scrolling to active verse
+
+**Holy Names** (for religious texts):
+- Special rendering for יהוה, אדני, אלהים, שדי, אל
+- Displays kavanot (intentions) on hover
+- Only for Tehilim, Tanakh, Tefilot (not for Talmud)
+
+**Progress Tracking**:
+- Auto-save every 3 seconds
+- Resume from last position
+- Statistics: completion %, reading speed, time spent, streaks
+- Session-based (works without login) or user-based (when authenticated)
+
+**Daf Yomi** (Talmud):
+- Auto-calculated from cycle start date (January 5, 2020)
+- 2,711 total dapim in Shas
+- Prominently displayed on /talmud and /learn pages
+
+**Admin Controls**:
+- `/admin/content-settings` - Enable/disable text types
+- Settings stored in localStorage
+- `content_settings` key: `{ tehilim: true, tanakh: true, ... }`
+
+### Type Definitions
+
+All text reader types are in `types/text-reader.ts`:
+- `TextType` - Union type of all supported types
+- `ReadingProgress` - Database schema interface
+- `SefariaTextResponse` - API response format
+- `TEXT_TYPES_CONFIG` - Configuration for each text type
+
+### Integration Points
+
+**Navigation**:
+- `/learn` - Main hub showing all enabled content types
+- Each type has its own route: `/tanakh`, `/talmud`, `/tehilim`
+- Stats pages: `/tanakh/stats`, `/talmud/stats`
+
+**Sefaria API Endpoints**:
+- Tanakh: `https://www.sefaria.org/api/texts/{Book}.{Chapter}`
+- Talmud: `https://www.sefaria.org/api/texts/{Tractate}.{Daf}{Amud}`
+- Tehilim: `https://www.sefaria.org/api/texts/Psalms.{Chapter}`
+
+**Text Cleaning**:
+- Removes HTML tags, cantillation marks, zero-width characters
+- Normalizes spaces and punctuation
+- See `lib/sefaria/client.ts:cleanText()`
+
+### Important Notes
+
+1. **Environment Variables**: Uses existing Supabase credentials
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` (not ANON_KEY)
+
+2. **RLS Policies**: The `reading_progress` table allows anonymous access (user_id IS NULL) for session-based tracking
+
+3. **Caching**: Sefaria API responses are cached for 24 hours (`next: { revalidate: 86400 }`)
+
+4. **Migration**: Database migration at `supabase/migrations/20250115_create_reading_progress.sql`
+
+5. **Existing Tehilim**: The original Tehilim reader still exists and works independently. The generic system complements it.
