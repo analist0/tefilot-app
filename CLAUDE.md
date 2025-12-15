@@ -168,11 +168,14 @@ Configuration in `components.json` with path aliases:
 
 The app uses Supabase auth with proper session management:
 
-1. **Middleware (middleware.ts)**:
+1. **Proxy (Next.js 16 requirement)**:
+   - `proxy.ts` - Entry point that calls the session update function
+   - `lib/supabase/proxy.ts` - Contains the actual middleware logic
    - Refreshes Supabase session on every request - prevents disconnection issues
    - Protects routes: `/admin`, `/profile`, `/settings` require authentication
    - Auto-redirects authenticated users away from `/auth/login` and `/auth/register`
    - Preserves redirect parameter for post-login navigation
+   - **Note**: Next.js 16 uses `proxy.ts` instead of `middleware.ts`
 
 2. **Auth Pages**:
    - Login: `app/auth/login/page.tsx` - uses `router.push()` + `router.refresh()` after successful login
@@ -180,9 +183,10 @@ The app uses Supabase auth with proper session management:
    - Callback: `app/api/auth/callback/route.ts` - handles OAuth flows and email confirmations
 
 3. **Admin Protection**:
-   - Middleware checks authentication
-   - Admin layout (`app/admin/layout.tsx`) checks role authorization (admin/editor only)
-   - Two-layer security: authentication (middleware) + authorization (layout)
+   - Proxy checks authentication (is user logged in?)
+   - Proxy also checks role authorization for `/admin/*` routes (admin/editor only)
+   - Admin layout (`app/admin/layout.tsx`) provides additional role checking as defense-in-depth
+   - Two-layer security: authentication + authorization
 
 ### Important Notes
 
