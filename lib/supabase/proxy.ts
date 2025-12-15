@@ -25,31 +25,43 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+  // Refresh session if expired - required for Server Components
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-    if (request.nextUrl.pathname.startsWith("/admin")) {
-      if (!user) {
-        const url = request.nextUrl.clone()
-        url.pathname = "/auth/login"
-        url.searchParams.set("redirect", request.nextUrl.pathname)
-        return NextResponse.redirect(url)
-      }
+  // Protected routes - require authentication
+  const protectedPaths = ["/admin", "/profile", "/settings"]
+  const isProtectedPath = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path))
 
-      // בדיקת הרשאות admin
+  if (isProtectedPath && !user) {
+    const redirectUrl = new URL("/auth/login", request.url)
+    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // Auth pages - redirect if already logged in
+  const authPaths = ["/auth/login", "/auth/register"]
+  const isAuthPath = authPaths.some((path) => request.nextUrl.pathname.startsWith(path))
+
+  if (isAuthPath && user) {
+    const redirectTo = request.nextUrl.searchParams.get("redirect") || "/"
+    return NextResponse.redirect(new URL(redirectTo, request.url))
+  }
+
+  // Admin authorization check
+  if (request.nextUrl.pathname.startsWith("/admin") && user) {
+    try {
       const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
 
       if (!profile || (profile.role !== "admin" && profile.role !== "editor")) {
         const url = request.nextUrl.clone()
         url.pathname = "/"
+        url.searchParams.set("error", "unauthorized")
         return NextResponse.redirect(url)
       }
-    }
-  } catch (error) {
-    console.error("Error in proxy middleware:", error)
-    if (request.nextUrl.pathname.startsWith("/admin")) {
+    } catch (error) {
+      console.error("Error checking admin permissions:", error)
       const url = request.nextUrl.clone()
       url.pathname = "/auth/login"
       return NextResponse.redirect(url)
