@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Sun, Clock, Moon, Heart, BookOpen, Scroll, Home, ArrowRight, Sparkles } from "lucide-react"
@@ -108,11 +109,15 @@ export default function TefilotPage() {
           <h2 className="text-3xl font-bold font-['Frank_Ruhl_Libre'] text-center">בחר תפילה</h2>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {tefilot.map((tefila) => (
-              <Card
+            {tefilot.map((tefila, index) => (
+              <motion.div
                 key={tefila.title}
-                className="group overflow-hidden border-2 hover:border-primary hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
               >
+                <Card className="group overflow-hidden border-2 hover:border-primary hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                >
                 <div className={`h-2 bg-gradient-to-r ${tefila.color}`} />
 
                 <CardHeader className="space-y-4">
@@ -149,6 +154,7 @@ export default function TefilotPage() {
                   </Button>
                 </CardContent>
               </Card>
+              </motion.div>
             ))}
           </div>
         </div>

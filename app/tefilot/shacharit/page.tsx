@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Sun, BookOpen, ChevronRight, Home, CheckCircle2, Circle } from "lucide-react"
+import { Sun, BookOpen, ChevronRight, Home, CheckCircle2, Circle, Sparkles, Award } from "lucide-react"
 import { SHACHARIT_STRUCTURE, type TefilaSection } from "@/lib/sefaria/tefilot"
 
 export default function ShacharitPage() {
@@ -35,8 +36,14 @@ export default function ShacharitPage() {
     const hasSubsections = section.subsections && section.subsections.length > 0
 
     return (
-      <div key={index} className={level > 0 ? "mr-6" : ""}>
-        <Card className={`mb-3 border-2 transition-all hover:shadow-lg ${isCompleted ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""}`}>
+      <motion.div
+        key={index}
+        className={level > 0 ? "mr-6" : ""}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.05 }}
+      >
+        <Card className={`mb-3 border-2 transition-all hover:shadow-xl hover:-translate-y-1 ${isCompleted ? "border-green-500 bg-gradient-to-br from-green-50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/10" : "hover:border-primary/50"}`}>
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-1">
@@ -93,7 +100,7 @@ export default function ShacharitPage() {
             </CardContent>
           )}
         </Card>
-      </div>
+      </motion.div>
     )
   }
 
@@ -106,7 +113,13 @@ export default function ShacharitPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-amber-50/30 dark:via-amber-950/10 to-background" dir="rtl">
       {/* Header */}
-      <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-amber-500 text-white py-12 px-4">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative overflow-hidden bg-gradient-to-br from-yellow-400 via-orange-400 to-amber-500 text-white py-12 px-4"
+      >
+        <div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-gradient(white,transparent_80%)]" />
         <div className="max-w-4xl mx-auto space-y-4">
           <Link href="/learn">
             <Button variant="ghost" className="text-white hover:bg-white/20 gap-2 -mr-2">
@@ -138,8 +151,24 @@ export default function ShacharitPage() {
               />
             </div>
           </div>
+
+          {/* Celebration for 100% completion */}
+          <AnimatePresence>
+            {progressPercent === 100 && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm"
+              >
+                <Award className="h-5 w-5" />
+                <span className="font-bold">כל הכבוד! השלמת את התפילה!</span>
+                <Sparkles className="h-5 w-5 animate-pulse" />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
