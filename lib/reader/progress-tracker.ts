@@ -240,18 +240,18 @@ export async function getStatistics(textType: TextType, totalSections: number = 
       }
     }
 
-    const completedSections = data.filter((p) => p.completed === true).length
-    const totalVerses = data.reduce((sum, p) => sum + (p.verses_read || 0), 0)
-    const totalTime = data.reduce((sum, p) => sum + (p.total_time_seconds || 0), 0)
+    const completedSections = data.filter((p: any) => p.completed === true).length
+    const totalVerses = data.reduce((sum: number, p: any) => sum + (p.verses_read || 0), 0)
+    const totalTime = data.reduce((sum: number, p: any) => sum + (p.total_time_seconds || 0), 0)
 
-    const speedValues = data.filter((p) => (p.reading_speed_wpm || 0) > 0)
+    const speedValues = data.filter((p: any) => (p.reading_speed_wpm || 0) > 0)
     const avgSpeed =
       speedValues.length > 0
-        ? speedValues.reduce((sum, p) => sum + (p.reading_speed_wpm || 0), 0) / speedValues.length
+        ? speedValues.reduce((sum: number, p: any) => sum + (p.reading_speed_wpm || 0), 0) / speedValues.length
         : 0
 
-    const currentStreak = Math.max(...data.map((p) => p.current_streak_days || 0), 0)
-    const longestStreak = Math.max(...data.map((p) => p.longest_streak_days || 0), 0)
+    const currentStreak = Math.max(...data.map((p: any) => p.current_streak_days || 0), 0)
+    const longestStreak = Math.max(...data.map((p: any) => p.longest_streak_days || 0), 0)
 
     const completionPercentage = (completedSections / totalSections) * 100
     const remainingSections = totalSections - completedSections

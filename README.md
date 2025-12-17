@@ -121,13 +121,46 @@ npm start
 ### הרצת Linter
 
 ```bash
-npm run lint
+npm run lint        # בדיקת שגיאות
+npm run lint:fix    # תיקון אוטומטי
 ```
+
+### בדיקות (Tests)
+
+הפרויקט משתמש ב-Vitest ו-Testing Library:
+
+```bash
+npm test                # הרצת בדיקות
+npm run test:watch      # מצב watch
+npm run test:ui         # ממשק UI לבדיקות
+npm run test:coverage   # דוח כיסוי קוד
+```
+
+### בדיקת טיפוסים
+
+```bash
+npm run type-check  # בדיקת TypeScript
+```
+
+### Pre-commit Hooks
+
+הפרויקט משתמש ב-Husky ו-lint-staged:
+- בכל commit, ESLint רץ אוטומטית על הקבצים שהשתנו
+- הקוד מתוקן אוטומטית לפני ה-commit
+
+### CI/CD
+
+GitHub Actions מריץ אוטומטית:
+- ✅ ESLint על כל הקוד
+- ✅ TypeScript type checking
+- ✅ בדיקות unit tests
+- ✅ בנייה (build) של הפרויקט
 
 ### קונבנציות קוד
 
 - השתמש ב-TypeScript עבור כל הקבצים
 - עקוב אחר ESLint rules
+- כתוב בדיקות לפונקציונליות חדשה
 - קומפוננטות ב-PascalCase
 - פונקציות ב-camelCase
 - קבועים ב-UPPER_SNAKE_CASE

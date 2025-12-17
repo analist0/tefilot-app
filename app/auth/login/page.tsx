@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("redirect") || "/"
+  const redirectTo = searchParams?.get("redirect") || "/"
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {

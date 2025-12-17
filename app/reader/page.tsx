@@ -28,9 +28,9 @@ interface TefilaData {
 
 function ReaderContent() {
   const searchParams = useSearchParams()
-  const type = searchParams.get("type")
-  const ref = searchParams.get("ref")
-  const title = searchParams.get("title")
+  const type = searchParams?.get("type")
+  const ref = searchParams?.get("ref")
+  const title = searchParams?.get("title")
 
   const [tefilaData, setTefilaData] = useState<TefilaData | null>(null)
   const [loading, setLoading] = useState(true)
