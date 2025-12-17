@@ -18,7 +18,7 @@ export async function CategoriesShowcase() {
 
   try {
     categories = await getCategories()
-  } catch (error) {
+  } catch {
     // Database not ready yet - show default categories
     categories = [
       {

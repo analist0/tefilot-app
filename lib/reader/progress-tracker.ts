@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client"
-import type { TextType, ReadingProgress } from "@/types/text-reader"
+import type { TextType, ReadingProgress as _ReadingProgress } from "@/types/text-reader"
 
 export interface ReadingSession {
   startTime: number

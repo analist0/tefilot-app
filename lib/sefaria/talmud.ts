@@ -68,7 +68,6 @@ export function calculateDafYomi(date: Date = new Date()): { tractate: string; d
   const diffTime = date.getTime() - cycleStart.getTime()
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
-  let totalDafs = 0
   let currentDaf = diffDays % 2711 // Total dapim in Shas
 
   for (const tractate of TALMUD_TRACTATES) {
@@ -83,7 +82,6 @@ export function calculateDafYomi(date: Date = new Date()): { tractate: string; d
       }
     }
     currentDaf -= tractatePages
-    totalDafs += tractatePages
   }
 
   // Fallback

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Accordion as _Accordion, AccordionContent as _AccordionContent, AccordionItem as _AccordionItem, AccordionTrigger as _AccordionTrigger } from "@/components/ui/accordion"
 import { Sun, BookOpen, ChevronRight, Home, CheckCircle2, Circle, Sparkles, Award } from "lucide-react"
 import { SHACHARIT_STRUCTURE, type TefilaSection } from "@/lib/sefaria/tefilot"
 

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   try {
     const articles = await searchArticles(query)
     return NextResponse.json({ articles })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ articles: [], error: "Search failed" }, { status: 500 })
   }
 }

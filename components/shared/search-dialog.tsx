@@ -29,7 +29,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
       const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
       const data = await response.json()
       setResults(data.articles || [])
-    } catch (error) {
+    } catch {
       setResults([])
     } finally {
       setLoading(false)

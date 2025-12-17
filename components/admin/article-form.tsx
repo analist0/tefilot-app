@@ -76,7 +76,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
   })
 
   const watchTitle = watch("title")
-  const watchContent = watch("content")
+  const _watchContent = watch("content")
 
   useEffect(() => {
     const wordCount = editorContent

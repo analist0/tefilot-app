@@ -15,7 +15,7 @@ export async function ArticlesGrid({ categorySlug }: ArticlesGridProps) {
       const result = await getPublishedArticles(12)
       articles = result.articles
     }
-  } catch (error) {
+  } catch {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <p>אין מאמרים להצגה כרגע</p>

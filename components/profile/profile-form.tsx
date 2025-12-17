@@ -49,7 +49,7 @@ export function ProfileForm({ user, profile }: ProfileFormProps) {
       })
 
       router.refresh()
-    } catch (error) {
+    } catch {
       toast({
         title: "שגיאה",
         description: "שגיאה בשמירת הפרופיל",

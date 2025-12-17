@@ -62,11 +62,10 @@ export async function fetchChapterFromSefaria(chapter: number): Promise<TehilimC
 
   const url = `${SEFARIA_BASE_URL}/Psalms.${chapter}?context=0&pad=0`
 
-  console.log(`[v0] Sefaria: Fetching chapter ${chapter} from ${url}`)
-
+  // Set timeout for API request
   const controller = new AbortController()
   const timeoutId = setTimeout(() => {
-    console.log(`[v0] Sefaria: Timeout for chapter ${chapter}`)
+    console.warn(`[Sefaria] Request timeout for chapter ${chapter}`)
     controller.abort()
   }, 10000)
 
@@ -81,22 +80,16 @@ export async function fetchChapterFromSefaria(chapter: number): Promise<TehilimC
 
     clearTimeout(timeoutId)
 
-    console.log(`[v0] Sefaria: Response status for chapter ${chapter}: ${response.status}`)
-
     if (!response.ok) {
       throw new Error(`Failed to fetch chapter ${chapter} from Sefaria: ${response.statusText}`)
     }
 
     const data: SefariaResponse = await response.json()
 
-    console.log(`[v0] Sefaria: Parsed JSON for chapter ${chapter}`)
-
     // Handle both array and string responses
     const verses = Array.isArray(data.he) ? data.he : [data.he]
 
     const cleanVerses = verses.map((verse) => (typeof verse === "string" ? cleanText(verse) : String(verse)))
-
-    console.log(`[v0] Sefaria: Chapter ${chapter} has ${cleanVerses.length} verses`)
 
     return {
       chapter,

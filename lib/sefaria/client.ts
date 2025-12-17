@@ -53,11 +53,10 @@ export class SefariaClient {
   async fetchText(ref: string, context: number = 0): Promise<SefariaTextResponse> {
     const url = `${this.baseUrl}/texts/${encodeURIComponent(ref)}?context=${context}&pad=0`
 
-    console.log(`[Sefaria] Fetching: ${ref}`)
-
+    // Fetch text from Sefaria API
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
-      console.log(`[Sefaria] Timeout for: ${ref}`)
+      console.warn(`[Sefaria] Request timeout for: ${ref}`)
       controller.abort()
     }, 15000)
 

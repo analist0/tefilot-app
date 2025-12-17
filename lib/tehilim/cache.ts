@@ -96,7 +96,7 @@ export async function getChapter(chapter: number): Promise<TehilimChapter> {
   try {
     const localCache = getFromLocalStorage(chapter)
     if (localCache) {
-      console.log(`[v0] Cache: Found chapter ${chapter} in LocalStorage`)
+      // Found in LocalStorage cache
       return {
         chapter: localCache.chapter,
         verses: localCache.verses,
@@ -104,16 +104,14 @@ export async function getChapter(chapter: number): Promise<TehilimChapter> {
       }
     }
 
-    console.log(`[v0] Cache: Chapter ${chapter} not in LocalStorage, checking Supabase...`)
-
+    // Not in LocalStorage, checking Supabase cache
     const supabaseCache = await Promise.race([
       getFromSupabase(chapter),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
     ])
 
     if (supabaseCache) {
-      console.log(`[v0] Cache: Found chapter ${chapter} in Supabase`)
-      // Save to localStorage for next time
+      // Found in Supabase cache, save to localStorage
       saveToLocalStorage(chapter, {
         chapter: supabaseCache.chapter,
         verses: supabaseCache.verses,
@@ -127,11 +125,8 @@ export async function getChapter(chapter: number): Promise<TehilimChapter> {
       }
     }
 
-    console.log(`[v0] Cache: Chapter ${chapter} not in Supabase, fetching from Sefaria...`)
-
+    // Not in cache, fetching from Sefaria API
     const sefariaData = await fetchChapterFromSefaria(chapter)
-
-    console.log(`[v0] Cache: Fetched chapter ${chapter} from Sefaria`)
 
     // Save to both caches (don't wait)
     saveToLocalStorage(chapter, sefariaData)

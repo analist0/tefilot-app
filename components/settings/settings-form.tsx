@@ -29,7 +29,7 @@ export function SettingsForm({ user, profile }: SettingsFormProps) {
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [pushNotifications, setPushNotifications] = useState(false)
 
-  const router = useRouter()
+  const _router = useRouter()
   const supabase = createClient()
 
   const handlePasswordChange = async (e: React.FormEvent) => {

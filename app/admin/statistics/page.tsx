@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/server"
-import { BookOpen, BookMarked, Scroll, Users, TrendingUp, Calendar, Clock, Flame } from "lucide-react"
+import { BookOpen, BookMarked, Scroll, Users, TrendingUp, Calendar as _Calendar, Clock, Flame } from "lucide-react"
 
 async function getReadingStats() {
   const supabase = await createClient()

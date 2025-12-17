@@ -13,9 +13,9 @@ import { sefaria } from "@/lib/sefaria/client"
 import {
   BookOpen,
   AlertCircle,
-  Home,
+  Home as _Home,
   Loader2,
-  Sparkles,
+  Sparkles as _Sparkles,
   ArrowRight
 } from "lucide-react"
 
@@ -48,7 +48,6 @@ function ReaderContent() {
       setError(null)
 
       try {
-        console.log(`[Reader] Fetching: ${ref}`)
         const response = await sefaria.fetchText(ref)
 
         // Parse Hebrew text

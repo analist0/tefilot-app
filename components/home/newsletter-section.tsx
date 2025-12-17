@@ -28,7 +28,7 @@ export function NewsletterSection() {
         setStatus("error")
         setMessage(result.error || "אירעה שגיאה")
       }
-    } catch (error) {
+    } catch {
       setStatus("error")
       setMessage("אירעה שגיאה בהרשמה")
     }
