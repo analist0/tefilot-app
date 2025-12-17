@@ -9,8 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, ArrowRight } from "lucide-react"
 import { TANAKH_BOOKS } from "@/lib/sefaria/tanakh"
 
+type SederType = "torah" | "neviim" | "ketuvim"
+
 export default function TanakhPage() {
-  const [selectedSeder, setSelectedSeder] = useState<"torah" | "neviim" | "ketuvim">("torah")
+  const [selectedSeder, setSelectedSeder] = useState<SederType>("torah")
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4" dir="rtl">
@@ -37,7 +39,7 @@ export default function TanakhPage() {
         </div>
 
         {/* Tabs for Torah, Neviim, Ketuvim */}
-        <Tabs value={selectedSeder} onValueChange={(v) => setSelectedSeder(v as any)} className="w-full">
+        <Tabs value={selectedSeder} onValueChange={(v) => setSelectedSeder(v as SederType)} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="torah" className="text-lg">
               תורה

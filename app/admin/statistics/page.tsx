@@ -58,7 +58,7 @@ async function getUserStats() {
   const supabase = await createClient()
 
   try {
-    const { data: profiles, count } = await supabase
+    const { count } = await supabase
       .from("profiles")
       .select("*", { count: "exact" })
 
@@ -242,7 +242,7 @@ export default async function StatisticsPage() {
         <CardContent>
           {userStats.recentUsers.length > 0 ? (
             <div className="space-y-4">
-              {userStats.recentUsers.map((user: any) => (
+              {userStats.recentUsers.map((user: { id: string; full_name?: string; email: string; created_at: string; role?: string }) => (
                 <div key={user.id} className="flex items-center gap-4 p-3 rounded-lg border">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold">
                     {user.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "?"}

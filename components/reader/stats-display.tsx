@@ -19,6 +19,17 @@ import {
 import { getStatistics } from "@/lib/reader/progress-tracker"
 import type { TextType } from "@/types/text-reader"
 
+interface ReadingStatistics {
+  sectionsRead: number
+  versesRead: number
+  totalTimeSeconds: number
+  avgSpeedWpm: number
+  currentStreak: number
+  longestStreak: number
+  completionPercentage: number
+  estimatedTimeRemaining: number
+}
+
 interface StatsDisplayProps {
   textType: TextType
   title: string
@@ -36,7 +47,7 @@ export function StatsDisplay({
   backUrl,
   icon,
 }: StatsDisplayProps) {
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<ReadingStatistics | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

@@ -125,7 +125,7 @@ export class SefariaClient {
     type?: string[]
     categories?: string[]
     limit?: number
-  }): Promise<any> {
+  }): Promise<Record<string, unknown>> {
     const params = new URLSearchParams({
       q: query,
       ...(filters?.limit && { size: filters.limit.toString() }),
@@ -157,7 +157,7 @@ export class SefariaClient {
   /**
    * Get index/table of contents for a book
    */
-  async fetchIndex(title: string): Promise<any> {
+  async fetchIndex(title: string): Promise<Record<string, unknown>> {
     const url = `${this.baseUrl}/index/${encodeURIComponent(title)}`
 
     try {
@@ -181,7 +181,7 @@ export class SefariaClient {
    * Parse Hebrew text and clean it
    * Always use Hebrew (he) field, never English (text) field
    */
-  parseHebrewText(response: any): string[] {
+  parseHebrewText(response: Record<string, unknown>): string[] {
     // Always prioritize Hebrew text over English
     const hebrewText = response.he || response.text
 
@@ -199,7 +199,7 @@ export class SefariaClient {
   /**
    * Get daily learning (Daf Yomi, etc.)
    */
-  async fetchCalendar(calendar: "daf-yomi" | "parashat-hashavua" | "929"): Promise<any> {
+  async fetchCalendar(calendar: "daf-yomi" | "parashat-hashavua" | "929"): Promise<Record<string, unknown>> {
     const url = `${this.baseUrl}/calendars/${calendar}`
 
     try {
