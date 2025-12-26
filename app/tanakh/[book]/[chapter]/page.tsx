@@ -80,7 +80,10 @@ export default function TanakhChapterPage() {
     )
   }
 
-  if (!data || !data.text) {
+  // Parse verses from Sefaria response
+  const verses = sefaria.parseHebrewText(data)
+
+  if (!data || verses.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="border-destructive max-w-md">
@@ -92,9 +95,6 @@ export default function TanakhChapterPage() {
       </div>
     )
   }
-
-  // Parse verses from Sefaria response
-  const verses = sefaria.parseHebrewText(data.text)
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8" dir="rtl">

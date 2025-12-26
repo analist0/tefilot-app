@@ -85,7 +85,10 @@ export default function TalmudDafPage() {
     )
   }
 
-  if (!data || !data.text) {
+  // Parse text lines from Sefaria response
+  const lines = sefaria.parseHebrewText(data)
+
+  if (!data || lines.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="border-destructive max-w-md">
@@ -97,9 +100,6 @@ export default function TalmudDafPage() {
       </div>
     )
   }
-
-  // Parse text lines from Sefaria response
-  const lines = sefaria.parseHebrewText(data.text)
 
   // Calculate previous and next daf
   const getPrevDaf = () => {
