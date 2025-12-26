@@ -2,13 +2,17 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import Link from "next/link"
-import { ChevronRight, ChevronLeft, BookOpen, Loader2, ArrowRight, TrendingUp } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ChevronRight, ChevronLeft, BookOpen, Loader2, ArrowRight, TrendingUp, Keyboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { VerseDisplay } from "./verse-display"
 import { ReaderControls } from "./reader-controls"
+import { KeyboardShortcuts } from "./keyboard-shortcuts"
 import { HebrewDateDisplay } from "@/components/tehilim/hebrew-date-display"
 import { hebrewNumber } from "@/lib/tehilim/parse"
+import { toast } from "sonner"
 import type { TextType } from "@/types/text-reader"
 import {
   startReadingSession,
@@ -53,6 +57,7 @@ export function GenericTextReader({
   verseLabel = "פסוק",
   showHolyNames = true,
 }: GenericTextReaderProps) {
+  const router = useRouter()
   const [activeVerse, setActiveVerse] = useState<number>(0)
   const [activeWordIndex, setActiveWordIndex] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -173,6 +178,77 @@ export function GenericTextReader({
     }
   }, [activeVerse])
 
+  // Keyboard shortcuts handlers
+  const handleFontIncrease = useCallback(() => {
+    const newSize = Math.min(40, fontSize + 2)
+    handleFontSizeChange(newSize)
+  }, [fontSize, handleFontSizeChange])
+
+  const handleFontDecrease = useCallback(() => {
+    const newSize = Math.max(18, fontSize - 2)
+    handleFontSizeChange(newSize)
+  }, [fontSize, handleFontSizeChange])
+
+  const handleSpeedIncrease = useCallback(() => {
+    const newSpeed = Math.min(150, speed + 10)
+    handleSpeedChange(newSpeed)
+  }, [speed, handleSpeedChange])
+
+  const handleSpeedDecrease = useCallback(() => {
+    const newSpeed = Math.max(20, speed - 10)
+    handleSpeedChange(newSpeed)
+  }, [speed, handleSpeedChange])
+
+  const handleNextSection = useCallback(() => {
+    if (nextSectionUrl) {
+      router.push(nextSectionUrl)
+    }
+  }, [nextSectionUrl, router])
+
+  const handlePrevSection = useCallback(() => {
+    if (prevSectionUrl) {
+      router.push(prevSectionUrl)
+    }
+  }, [prevSectionUrl, router])
+
+  const showHelp = useCallback(() => {
+    toast.info(
+      <div className="space-y-2 text-right" dir="rtl">
+        <h3 className="font-bold text-lg mb-3">⌨️ קיצורי מקלדת</h3>
+        <div className="space-y-1.5 text-sm">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">הפעל/השהה</span>
+            <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">רווח / K</kbd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">פסוק הבא/קודם</span>
+            <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">← / →</kbd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">פרק הבא/קודם</span>
+            <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">N / P</kbd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">מהירות</span>
+            <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">↑ / ↓</kbd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">גופן</span>
+            <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">+ / -</kbd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">איפוס</span>
+            <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">R</kbd>
+          </div>
+        </div>
+      </div>,
+      {
+        duration: 8000,
+        closeButton: true,
+      }
+    )
+  }, [])
+
   if (verses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
@@ -183,30 +259,63 @@ export function GenericTextReader({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-36 sm:pb-32 relative">
-      {/* Background gradient effect */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/5 via-transparent to-transparent blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-amber-500/5 via-transparent to-transparent blur-3xl" />
-      </div>
+    <TooltipProvider>
+      <div className="space-y-4 sm:space-y-6 pb-36 sm:pb-32 relative">
+        {/* Keyboard shortcuts handler */}
+        <KeyboardShortcuts
+          onPlayPause={handlePlayPause}
+          onNextVerse={handleNextVerse}
+          onPrevVerse={handlePrevVerse}
+          onNextSection={handleNextSection}
+          onPrevSection={handlePrevSection}
+          onReset={handleReset}
+          onFontIncrease={handleFontIncrease}
+          onFontDecrease={handleFontDecrease}
+          onSpeedIncrease={handleSpeedIncrease}
+          onSpeedDecrease={handleSpeedDecrease}
+          isPlaying={isPlaying}
+        />
 
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <Link href={backUrl} className="inline-flex">
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground transition-all hover:gap-3">
-              <ArrowRight className="h-4 w-4" />
-              <span>חזרה</span>
-            </Button>
-          </Link>
-          {statsUrl && (
-            <Link href={statsUrl}>
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent hover:bg-primary/5 transition-all hover:gap-3 border-primary/20">
-                <TrendingUp className="h-4 w-4" />
-                <span>הסטטיסטיקות שלי</span>
+        {/* Background gradient effect */}
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/5 via-transparent to-transparent blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-amber-500/5 via-transparent to-transparent blur-3xl" />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <Link href={backUrl} className="inline-flex">
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground transition-all hover:gap-3">
+                <ArrowRight className="h-4 w-4" />
+                <span>חזרה</span>
               </Button>
             </Link>
-          )}
-        </div>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={showHelp}
+                    className="h-9 w-9 bg-transparent hover:bg-primary/10 border-primary/20 transition-all hover:scale-110"
+                  >
+                    <Keyboard className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>קיצורי מקלדת (לחץ ?)</p>
+                </TooltipContent>
+              </Tooltip>
+              {statsUrl && (
+                <Link href={statsUrl}>
+                  <Button variant="outline" size="sm" className="gap-2 bg-transparent hover:bg-primary/5 transition-all hover:gap-3 border-primary/20">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>הסטטיסטיקות שלי</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
 
         {/* Header with gradient */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-6 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/10 shadow-lg shadow-primary/5 backdrop-blur-sm">
@@ -292,20 +401,21 @@ export function GenericTextReader({
         </CardContent>
       </Card>
 
-      <ReaderControls
-        isPlaying={isPlaying}
-        onPlayPause={handlePlayPause}
-        onReset={handleReset}
-        onNextVerse={handleNextVerse}
-        onPrevVerse={handlePrevVerse}
-        speed={speed}
-        onSpeedChange={handleSpeedChange}
-        fontSize={fontSize}
-        onFontSizeChange={handleFontSizeChange}
-        currentVerse={activeVerse + 1}
-        totalVerses={verseCount}
-        verseLabel={verseLabel}
-      />
-    </div>
+        <ReaderControls
+          isPlaying={isPlaying}
+          onPlayPause={handlePlayPause}
+          onReset={handleReset}
+          onNextVerse={handleNextVerse}
+          onPrevVerse={handlePrevVerse}
+          speed={speed}
+          onSpeedChange={handleSpeedChange}
+          fontSize={fontSize}
+          onFontSizeChange={handleFontSizeChange}
+          currentVerse={activeVerse + 1}
+          totalVerses={verseCount}
+          verseLabel={verseLabel}
+        />
+      </div>
+    </TooltipProvider>
   )
 }
