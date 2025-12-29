@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { SearchDialog } from "@/components/shared/search-dialog"
 import { UserMenu } from "@/components/auth/user-menu"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 
 const navLinks = [
   { href: "/tehilim", label: "תהילים", icon: BookOpen },
@@ -129,7 +130,7 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Desktop Right Side - Search & User */}
+        {/* Desktop Right Side - Search, Theme & User */}
         <div className="hidden lg:flex items-center gap-2">
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <Button
@@ -143,11 +144,13 @@ export function Header() {
             </Button>
           </motion.div>
 
+          <ThemeToggle />
           <UserMenu />
         </div>
 
-        {/* Mobile User Menu */}
-        <div className="lg:hidden">
+        {/* Mobile Theme & User Menu */}
+        <div className="lg:hidden flex items-center gap-1">
+          <ThemeToggle />
           <UserMenu />
         </div>
       </div>
