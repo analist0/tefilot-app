@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Menu, Search, X, BookOpen, Sparkles, ScrollText, Star, Heart, Lightbulb } from "lucide-react"
+import { Menu, Search, X, BookOpen, Sparkles, ScrollText, Star, Heart, Lightbulb, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { SearchDialog } from "@/components/shared/search-dialog"
@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/shared/theme-toggle"
 
 const navLinks = [
   { href: "/tehilim", label: "תהילים", icon: BookOpen },
+  { href: "/stats", label: "הסטטיסטיקות שלי", icon: BarChart3 },
   { href: "/category/parasha", label: "פרשות השבוע", icon: ScrollText },
   { href: "/category/kabbalah", label: "קבלה", icon: Sparkles },
   { href: "/category/segulot", label: "סגולות", icon: Star },
