@@ -371,7 +371,7 @@ function getMostReadChapters(progress: any[], limit = 5): number[] {
   }, {} as Record<number, number>)
 
   return Object.entries(counts)
-    .sort(([, a], [, b]) => b - a)
+    .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, limit)
     .map(([chapter]) => parseInt(chapter))
 }
@@ -384,7 +384,7 @@ function getMostReadTefilot(progress: any[], limit = 5): string[] {
   }, {} as Record<string, number>)
 
   return Object.entries(counts)
-    .sort(([, a], [, b]) => b - a)
+    .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, limit)
     .map(([tefila]) => tefila)
 }
@@ -426,6 +426,15 @@ export async function getDailyActivity(userId: string, days = 30): Promise<Daily
 
   if (!data) return []
 
+  interface DayData {
+    date: Date
+    chaptersRead: number
+    dapimLearned: number
+    prayersCompleted: number
+    minutesSpent: number
+    systemsUsed: Set<string>
+  }
+
   // Group by date
   const byDate = data.reduce((acc, item) => {
     const date = new Date(item.updated_at).toDateString()
@@ -436,7 +445,7 @@ export async function getDailyActivity(userId: string, days = 30): Promise<Daily
         dapimLearned: 0,
         prayersCompleted: 0,
         minutesSpent: 0,
-        systemsUsed: new Set(),
+        systemsUsed: new Set<string>(),
       }
     }
 
@@ -452,11 +461,11 @@ export async function getDailyActivity(userId: string, days = 30): Promise<Daily
     acc[date].systemsUsed.add(item.text_type)
 
     return acc
-  }, {} as Record<string, any>)
+  }, {} as Record<string, DayData>)
 
   return Object.values(byDate).map(day => ({
     ...day,
-    systemsUsed: Array.from(day.systemsUsed),
+    systemsUsed: Array.from(day.systemsUsed) as ('tehilim' | 'talmud' | 'tanakh' | 'tefilot')[],
   }))
 }
 

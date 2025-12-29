@@ -119,7 +119,7 @@ export default function RootLayout({
         <link rel="alternate" type="application/rss+xml" title="אור הישרה RSS" href="/rss.xml" />
         <link rel="alternate" type="application/feed+json" title="אור הישרה JSON Feed" href="/feed.json" />
       </head>
-      <body className={`${heebo.variable} ${frankRuhl.variable} ${_geistMono.variable} font-sans antialiased`}>
+      <body className={`${heebo.variable} ${frankRuhl.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

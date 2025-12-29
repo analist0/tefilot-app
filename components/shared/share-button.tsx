@@ -98,7 +98,7 @@ export function ShareButton({
           </Button>
         </motion.div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56" dir="rtl">
+      <DropdownMenuContent align="end" className="w-56">
         {hasNativeShare && (
           <>
             <DropdownMenuItem onClick={handleNativeShare} className="gap-2 cursor-pointer">
