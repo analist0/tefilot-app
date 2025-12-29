@@ -48,6 +48,13 @@ function getFromLocalStorage(ref: string): string[] | null {
 
     const parsed: CachedText = JSON.parse(cached)
 
+    // Validate data
+    if (!parsed || !Array.isArray(parsed.verses) || parsed.verses.length === 0) {
+      console.warn(`[Cache] ⚠️ Invalid data in localStorage for ${ref}, removing...`)
+      localStorage.removeItem(key)
+      return null
+    }
+
     // Check expiration
     const cachedDate = new Date(parsed.cached_at)
     const daysSinceCached = (Date.now() - cachedDate.getTime()) / (1000 * 60 * 60 * 24)
@@ -57,7 +64,7 @@ function getFromLocalStorage(ref: string): string[] | null {
       return null
     }
 
-    console.log(`[Cache] ✅ Hit - localStorage: ${ref}`)
+    console.log(`[Cache] ✅ Hit - localStorage: ${ref} (${parsed.verses.length} verses)`)
 
     // Also save to memory for faster access
     saveToMemory(ref, parsed.verses)
@@ -72,6 +79,12 @@ function getFromLocalStorage(ref: string): string[] | null {
 function saveToLocalStorage(ref: string, verses: string[]) {
   if (typeof window === "undefined") return
 
+  // Validate input
+  if (!ref || !Array.isArray(verses) || verses.length === 0) {
+    console.warn(`[Cache] ⚠️ Cannot save invalid data to localStorage:`, { ref, versesLength: verses?.length })
+    return
+  }
+
   try {
     const key = `text_cache_${CACHE_VERSION}_${ref}`
     const data: CachedText = {
@@ -82,7 +95,7 @@ function saveToLocalStorage(ref: string, verses: string[]) {
     }
 
     localStorage.setItem(key, JSON.stringify(data))
-    console.log(`[Cache] 💾 Saved to localStorage: ${ref}`)
+    console.log(`[Cache] 💾 Saved to localStorage: ${ref} (${verses.length} verses)`)
   } catch (error) {
     console.error("[Cache] Error saving to localStorage:", error)
     // If localStorage is full, clear old caches
@@ -112,7 +125,19 @@ async function getFromSupabase(ref: string): Promise<string[] | null> {
       .eq("text_ref", ref)
       .maybeSingle()
 
-    if (error || !data) return null
+    if (error) {
+      console.error("[Cache] Supabase error:", error)
+      return null
+    }
+
+    if (!data) return null
+
+    // Validate data
+    if (!data.verses || !Array.isArray(data.verses) || data.verses.length === 0) {
+      console.warn(`[Cache] ⚠️ Invalid data in Supabase for ${ref}, removing...`)
+      await supabase.from("cached_texts").delete().eq("text_ref", ref)
+      return null
+    }
 
     // Check expiration
     const cachedDate = new Date(data.cached_at)
@@ -124,7 +149,7 @@ async function getFromSupabase(ref: string): Promise<string[] | null> {
       return null
     }
 
-    console.log(`[Cache] ✅ Hit - Supabase: ${ref}`)
+    console.log(`[Cache] ✅ Hit - Supabase: ${ref} (${data.verses.length} verses)`)
 
     // Save to faster caches
     saveToLocalStorage(ref, data.verses)
@@ -138,6 +163,12 @@ async function getFromSupabase(ref: string): Promise<string[] | null> {
 }
 
 async function saveToSupabase(ref: string, verses: string[]) {
+  // Validate input
+  if (!ref || !Array.isArray(verses) || verses.length === 0) {
+    console.warn(`[Cache] ⚠️ Cannot save invalid data to Supabase:`, { ref, versesLength: verses?.length })
+    return
+  }
+
   try {
     const supabase = createClient()
 
@@ -155,7 +186,7 @@ async function saveToSupabase(ref: string, verses: string[]) {
     if (error) {
       console.error("[Cache] Error saving to Supabase:", error)
     } else {
-      console.log(`[Cache] 💾 Saved to Supabase: ${ref}`)
+      console.log(`[Cache] 💾 Saved to Supabase: ${ref} (${verses.length} verses)`)
     }
   } catch (error) {
     console.error("[Cache] Error in saveToSupabase:", error)
@@ -168,19 +199,34 @@ async function saveToSupabase(ref: string, verses: string[]) {
 async function fetchFromSefaria(ref: string): Promise<string[]> {
   console.log(`[Cache] 🌐 Fetching from Sefaria API: ${ref}`)
 
-  const response = await sefaria.fetchText(ref)
-  const verses = sefaria.parseHebrewText(response)
+  try {
+    const response = await sefaria.fetchText(ref)
+    console.log(`[Cache] 📦 Received response from Sefaria:`, {
+      hasHe: !!response.he,
+      hasText: !!response.text,
+      heType: Array.isArray(response.he) ? 'array' : typeof response.he,
+      textType: Array.isArray(response.text) ? 'array' : typeof response.text,
+    })
 
-  if (!verses || verses.length === 0) {
-    throw new Error(`לא נמצא טקסט עבור ${ref}`)
+    const verses = sefaria.parseHebrewText(response)
+    console.log(`[Cache] ✅ Parsed ${verses.length} verses from response`)
+
+    if (!verses || verses.length === 0) {
+      console.error(`[Cache] ❌ No verses found for ${ref}. Response:`, response)
+      throw new Error(`לא נמצא טקסט עבור ${ref}`)
+    }
+
+    // Save to all caches
+    saveToMemory(ref, verses)
+    saveToLocalStorage(ref, verses)
+    saveToSupabase(ref, verses) // async, don't wait
+
+    console.log(`[Cache] 💾 Saved ${verses.length} verses to all caches for ${ref}`)
+    return verses
+  } catch (error) {
+    console.error(`[Cache] ❌ Error fetching from Sefaria:`, error)
+    throw error
   }
-
-  // Save to all caches
-  saveToMemory(ref, verses)
-  saveToLocalStorage(ref, verses)
-  saveToSupabase(ref, verses) // async, don't wait
-
-  return verses
 }
 
 /**
