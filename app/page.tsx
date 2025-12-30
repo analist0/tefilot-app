@@ -48,37 +48,43 @@ export default function HomePage() {
   }, [])
 
   const getIcon = (type: TextType) => {
-    const icons = {
+    const icons: Record<TextType, React.JSX.Element> = {
       tehilim: <BookMarked className="h-8 w-8" />,
       tanakh: <Book className="h-8 w-8" />,
       talmud: <BookOpen className="h-8 w-8" />,
       tefilot: <Scroll className="h-8 w-8" />,
       halacha: <Scale className="h-8 w-8" />,
       sefarim: <Library className="h-8 w-8" />,
+      zohar: <Sparkles className="h-8 w-8" />,
+      etz_chaim: <BookOpen className="h-8 w-8" />,
     }
     return icons[type]
   }
 
   const getColor = (type: TextType) => {
-    const colors = {
+    const colors: Record<TextType, string> = {
       tehilim: "from-blue-500 to-cyan-500",
       tanakh: "from-green-500 to-emerald-500",
       talmud: "from-purple-500 to-pink-500",
       tefilot: "from-amber-500 to-orange-500",
       halacha: "from-red-500 to-rose-500",
       sefarim: "from-indigo-500 to-violet-500",
+      zohar: "from-cyan-400 to-blue-500",
+      etz_chaim: "from-emerald-400 to-green-500",
     }
     return colors[type]
   }
 
   const getUrl = (type: TextType) => {
-    const urls = {
+    const urls: Record<TextType, string> = {
       tehilim: "/tehilim",
       tanakh: "/tanakh",
       talmud: "/talmud",
       tefilot: "/tefilot",
       halacha: "/halacha",
       sefarim: "/sefarim",
+      zohar: "/zohar",
+      etz_chaim: "/etz-chaim",
     }
     return urls[type]
   }

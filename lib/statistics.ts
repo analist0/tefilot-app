@@ -463,7 +463,8 @@ export async function getDailyActivity(userId: string, days = 30): Promise<Daily
     return acc
   }, {} as Record<string, DayData>)
 
-  return Object.values(byDate).map(day => ({
+  const daysList = Object.values(byDate) as DayData[]
+  return daysList.map((day) => ({
     ...day,
     systemsUsed: Array.from(day.systemsUsed) as ('tehilim' | 'talmud' | 'tanakh' | 'tefilot')[],
   }))
