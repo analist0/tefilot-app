@@ -13,9 +13,9 @@ import { sefaria } from "@/lib/sefaria/client"
 import {
   BookOpen,
   AlertCircle,
-  Home,
+  Home as _Home,
   Loader2,
-  Sparkles,
+  Sparkles as _Sparkles,
   ArrowRight
 } from "lucide-react"
 
@@ -28,9 +28,9 @@ interface TefilaData {
 
 function ReaderContent() {
   const searchParams = useSearchParams()
-  const type = searchParams.get("type")
-  const ref = searchParams.get("ref")
-  const title = searchParams.get("title")
+  const type = searchParams?.get("type")
+  const ref = searchParams?.get("ref")
+  const title = searchParams?.get("title")
 
   const [tefilaData, setTefilaData] = useState<TefilaData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -48,7 +48,6 @@ function ReaderContent() {
       setError(null)
 
       try {
-        console.log(`[Reader] Fetching: ${ref}`)
         const response = await sefaria.fetchText(ref)
 
         // Parse Hebrew text

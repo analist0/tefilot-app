@@ -11,9 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast"
 import { ImageUpload } from "@/components/admin/image-upload"
 import type { Profile } from "@/types"
+import type { User } from "@supabase/supabase-js"
 
 interface ProfileFormProps {
-  user: any
+  user: User
   profile: Profile | null
 }
 
@@ -49,7 +50,7 @@ export function ProfileForm({ user, profile }: ProfileFormProps) {
       })
 
       router.refresh()
-    } catch (error) {
+    } catch {
       toast({
         title: "שגיאה",
         description: "שגיאה בשמירת הפרופיל",

@@ -53,11 +53,10 @@ export class SefariaClient {
   async fetchText(ref: string, context: number = 0): Promise<SefariaTextResponse> {
     const url = `${this.baseUrl}/texts/${encodeURIComponent(ref)}?context=${context}&pad=0`
 
-    console.log(`[Sefaria] Fetching: ${ref}`)
-
+    // Fetch text from Sefaria API
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
-      console.log(`[Sefaria] Timeout for: ${ref}`)
+      console.warn(`[Sefaria] Request timeout for: ${ref}`)
       controller.abort()
     }, 15000)
 
@@ -126,7 +125,7 @@ export class SefariaClient {
     type?: string[]
     categories?: string[]
     limit?: number
-  }): Promise<any> {
+  }): Promise<Record<string, unknown>> {
     const params = new URLSearchParams({
       q: query,
       ...(filters?.limit && { size: filters.limit.toString() }),
@@ -158,7 +157,7 @@ export class SefariaClient {
   /**
    * Get index/table of contents for a book
    */
-  async fetchIndex(title: string): Promise<any> {
+  async fetchIndex(title: string): Promise<Record<string, unknown>> {
     const url = `${this.baseUrl}/index/${encodeURIComponent(title)}`
 
     try {
@@ -182,7 +181,7 @@ export class SefariaClient {
    * Parse Hebrew text and clean it
    * Always use Hebrew (he) field, never English (text) field
    */
-  parseHebrewText(response: any): string[] {
+  parseHebrewText(response: Record<string, unknown>): string[] {
     // Always prioritize Hebrew text over English
     const hebrewText = response.he || response.text
 
@@ -200,7 +199,7 @@ export class SefariaClient {
   /**
    * Get daily learning (Daf Yomi, etc.)
    */
-  async fetchCalendar(calendar: "daf-yomi" | "parashat-hashavua" | "929"): Promise<any> {
+  async fetchCalendar(calendar: "daf-yomi" | "parashat-hashavua" | "929"): Promise<Record<string, unknown>> {
     const url = `${this.baseUrl}/calendars/${calendar}`
 
     try {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription as _CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,17 @@ import {
 } from "lucide-react"
 import { getStatistics } from "@/lib/reader/progress-tracker"
 import type { TextType } from "@/types/text-reader"
+
+interface ReadingStatistics {
+  sectionsRead: number
+  versesRead: number
+  totalTimeSeconds: number
+  avgSpeedWpm: number
+  currentStreak: number
+  longestStreak: number
+  completionPercentage: number
+  estimatedTimeRemaining: number
+}
 
 interface StatsDisplayProps {
   textType: TextType
@@ -36,7 +47,7 @@ export function StatsDisplay({
   backUrl,
   icon,
 }: StatsDisplayProps) {
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<ReadingStatistics | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

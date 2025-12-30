@@ -21,7 +21,7 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ user, profile }: SettingsFormProps) {
-  const [currentPassword, setCurrentPassword] = useState("")
+  const [_currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -29,7 +29,7 @@ export function SettingsForm({ user, profile }: SettingsFormProps) {
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [pushNotifications, setPushNotifications] = useState(false)
 
-  const router = useRouter()
+  const _router = useRouter()
   const supabase = createClient()
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -60,8 +60,9 @@ export function SettingsForm({ user, profile }: SettingsFormProps) {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-    } catch (error: any) {
-      setMessage({ type: "error", text: error.message || "שגיאה בשינוי הסיסמה" })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "שגיאה בשינוי הסיסמה"
+      setMessage({ type: "error", text: errorMessage })
     } finally {
       setLoading(false)
     }
@@ -76,8 +77,9 @@ export function SettingsForm({ user, profile }: SettingsFormProps) {
     try {
       // TODO: Implement account deletion logic
       setMessage({ type: "error", text: "מחיקת חשבון לא זמינה כרגע" })
-    } catch (error: any) {
-      setMessage({ type: "error", text: error.message })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "שגיאה במחיקת חשבון"
+      setMessage({ type: "error", text: errorMessage })
     } finally {
       setLoading(false)
     }

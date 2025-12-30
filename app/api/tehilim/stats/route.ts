@@ -9,7 +9,7 @@ export async function GET() {
       data: { user },
     } = await supabase.auth.getUser()
 
-    const { data: progress, error } = await supabase
+    const { data: progress } = await supabase
       .from("tehilim_progress")
       .select("*")
       .or(user ? `user_id.eq.${user.id}` : "session_id.not.is.null")

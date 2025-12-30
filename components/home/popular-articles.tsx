@@ -11,7 +11,7 @@ export async function PopularArticles() {
 
   try {
     articles = await getPopularArticles(5)
-  } catch (error) {
+  } catch {
     // Database not ready yet
     return null
   }

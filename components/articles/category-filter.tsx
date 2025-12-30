@@ -11,7 +11,7 @@ export async function CategoryFilter({ selectedCategory }: CategoryFilterProps) 
 
   try {
     categories = await getCategories()
-  } catch (error) {
+  } catch {
     return null
   }
 

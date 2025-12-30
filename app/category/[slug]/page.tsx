@@ -34,7 +34,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
         description: category.description || `מאמרים בנושא ${category.name}`,
       }
     }
-  } catch {}
+  } catch {
+    // Failed to fetch categories for metadata, using default
+  }
 
   return {
     title: "קטגוריה | אור התורה",
