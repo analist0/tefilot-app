@@ -1,8 +1,13 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Analytics } from "@vercel/analytics/next"
+import { Toaster } from "sonner"
+import { ThemeProvider } from "next-themes"
 import { JsonLd } from "@/components/seo/json-ld"
 import { generateOrganizationJsonLd, generateWebsiteJsonLd } from "@/lib/seo"
+import { ScrollProgress } from "@/components/shared/scroll-progress"
+import { KeyboardShortcutsGuide } from "@/components/shared/keyboard-shortcuts-guide"
+import { GlobalKeyboardHandler } from "@/components/shared/global-keyboard-handler"
 import "./globals.css"
 
 import { Heebo, Frank_Ruhl_Libre, Geist as V0_Font_Geist, Geist_Mono as V0_Font_Geist_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
@@ -114,9 +119,20 @@ export default function RootLayout({
         <link rel="alternate" type="application/rss+xml" title="אור הישרה RSS" href="/rss.xml" />
         <link rel="alternate" type="application/feed+json" title="אור הישרה JSON Feed" href="/feed.json" />
       </head>
-      <body className={`${heebo.variable} ${frankRuhl.variable} ${_geistMono.variable} font-sans antialiased`}>
-        {children}
-        <Analytics />
+      <body className={`${heebo.variable} ${frankRuhl.variable} font-sans antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          <ScrollProgress />
+          <GlobalKeyboardHandler />
+          <KeyboardShortcutsGuide />
+          {children}
+          <Toaster position="top-center" richColors dir="rtl" />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -43,27 +43,34 @@ export function VerseDisplay({
     <div
       ref={verseRef}
       className={cn(
-        "py-5 px-4 sm:px-6 rounded-2xl transition-all duration-300 mb-2",
+        "py-6 px-5 sm:px-7 rounded-2xl transition-all duration-500 mb-3 group relative overflow-hidden",
         isActive
-          ? "bg-amber-50 dark:bg-amber-950/30 shadow-sm ring-1 ring-amber-200 dark:ring-amber-800"
-          : "hover:bg-muted/30",
+          ? "bg-gradient-to-br from-amber-50 via-amber-50/90 to-amber-100/50 dark:from-amber-950/40 dark:via-amber-950/30 dark:to-amber-900/20 shadow-xl shadow-amber-500/10 ring-2 ring-amber-300/60 dark:ring-amber-700/60 scale-[1.02] border border-amber-200/50 dark:border-amber-800/50"
+          : "hover:bg-gradient-to-br hover:from-muted/60 hover:via-muted/40 hover:to-muted/20 hover:shadow-lg hover:scale-[1.01] border border-transparent hover:border-border/50",
       )}
     >
-      <div className="flex gap-3 sm:gap-4">
-        {/* Verse/Line number badge */}
+      {/* Gradient overlay for active verse */}
+      {isActive && (
+        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-amber-200/10 to-transparent dark:via-amber-500/5 animate-pulse pointer-events-none" />
+      )}
+
+      <div className="flex gap-4 sm:gap-5 relative z-10">
+        {/* Enhanced Verse/Line number badge */}
         <span
           className={cn(
-            "flex-shrink-0 inline-flex items-center justify-center text-sm font-bold rounded-xl min-w-[2.5rem] h-9 px-2.5 transition-colors",
-            isActive ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground",
+            "flex-shrink-0 inline-flex items-center justify-center text-base font-bold rounded-xl min-w-[3rem] h-11 px-3 transition-all duration-300 shadow-sm",
+            isActive
+              ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/30 ring-offset-2 ring-offset-background scale-110"
+              : "bg-gradient-to-br from-muted to-muted/80 text-muted-foreground group-hover:from-muted group-hover:to-muted/90 group-hover:text-foreground group-hover:shadow-md group-hover:scale-105",
           )}
         >
           {hebrewNumber(verseNumber)}
         </span>
 
-        {/* Verse text - word by word */}
+        {/* Enhanced Verse text - word by word */}
         <p
           className="flex-1 leading-loose font-serif text-right"
-          style={{ fontSize: `${fontSize}px`, lineHeight: 2.2 }}
+          style={{ fontSize: `${fontSize}px`, lineHeight: 2.4 }}
         >
           {words.map((word, wordIdx) => {
             const isActiveWord = isActive && activeWordIndex === wordIdx
@@ -87,16 +94,17 @@ export function VerseDisplay({
                         <span
                           key={segIdx}
                           className={cn(
-                            "transition-all duration-200",
-                            isActiveWord && "bg-primary text-primary-foreground px-1.5 py-1 rounded-lg font-semibold",
-                            isPastWord && "text-muted-foreground/50",
+                            "transition-all duration-300",
+                            isActiveWord &&
+                              "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground px-2.5 py-1.5 rounded-xl font-bold shadow-lg shadow-primary/30 scale-110 inline-block",
+                            isPastWord && "text-muted-foreground/40 opacity-60",
                           )}
                         >
                           {segment.content}
                         </span>
                       )
                     })}
-                    <span className="inline-block w-2"> </span>
+                    <span className="inline-block w-2.5"> </span>
                   </span>
                 )
               }
@@ -107,15 +115,16 @@ export function VerseDisplay({
               <span key={wordIdx} className="inline">
                 <span
                   className={cn(
-                    "transition-all duration-200 inline-block",
+                    "transition-all duration-300 inline-block hover:text-primary/80 cursor-default",
                     isActiveWord &&
-                      "bg-primary text-primary-foreground px-2 py-1 rounded-lg font-semibold shadow-md scale-105",
-                    isPastWord && "text-muted-foreground/40",
+                      "bg-gradient-to-br from-primary via-primary to-primary/90 text-primary-foreground px-3 py-1.5 rounded-xl font-bold shadow-2xl shadow-primary/40 scale-[1.15] ring-2 ring-primary/30 ring-offset-2 ring-offset-amber-50 dark:ring-offset-amber-950/30 animate-in zoom-in-50",
+                    isPastWord && "text-muted-foreground/30 opacity-50",
+                    !isActiveWord && !isPastWord && "hover:scale-105",
                   )}
                 >
                   {word}
                 </span>
-                <span className="inline-block w-2"> </span>
+                <span className="inline-block w-2.5"> </span>
               </span>
             )
           })}

@@ -183,18 +183,65 @@ export class SefariaClient {
    * Always use Hebrew (he) field, never English (text) field
    */
   parseHebrewText(response: any): string[] {
+    console.log('[Sefaria] parseHebrewText called with:', {
+      hasHe: !!response?.he,
+      hasText: !!response?.text,
+      heType: response?.he ? (Array.isArray(response.he) ? 'array' : typeof response.he) : 'undefined',
+      textType: response?.text ? (Array.isArray(response.text) ? 'array' : typeof response.text) : 'undefined',
+    })
+
+    // Validate response exists
+    if (!response) {
+      console.error('[Sefaria] ❌ No response object provided')
+      throw new Error('לא התקבלה תשובה מהשרת')
+    }
+
     // Always prioritize Hebrew text over English
     const hebrewText = response.he || response.text
+
+    // Validate we actually have text
+    if (!hebrewText || (typeof hebrewText !== 'string' && !Array.isArray(hebrewText))) {
+      console.error('[Sefaria] ❌ No valid Hebrew or English text found in response:', response)
+      throw new Error('לא נמצא טקסט עברי בתשובה')
+    }
+
+    let verses: string[] = []
 
     if (Array.isArray(hebrewText)) {
       // Handle nested arrays (like Talmud)
       if (Array.isArray(hebrewText[0])) {
-        return hebrewText.flat().map((t) => this.cleanText(String(t))).filter(t => t.length > 0)
+        verses = hebrewText.flat()
+          .filter(t => t && typeof t === 'string' && t.trim().length > 0)
+          .map((t) => this.cleanText(String(t)))
+          .filter(t => t.length > 0)
+      } else {
+        verses = hebrewText
+          .filter(t => t && typeof t === 'string' && t.trim().length > 0)
+          .map((t) => this.cleanText(String(t)))
+          .filter(t => t.length > 0)
       }
-      return hebrewText.map((t) => this.cleanText(String(t))).filter(t => t.length > 0)
+    } else if (typeof hebrewText === 'string') {
+      const cleaned = this.cleanText(hebrewText)
+      if (cleaned.length > 0) {
+        verses = [cleaned]
+      }
     }
 
-    return [this.cleanText(String(hebrewText))].filter(t => t.length > 0)
+    // Final validation - make sure we have actual content
+    if (verses.length === 0) {
+      console.error('[Sefaria] ❌ No verses found after parsing. Raw text:', hebrewText)
+      throw new Error('לא נמצאו פסוקים תקינים בטקסט')
+    }
+
+    // Validate no verse is the literal string "undefined"
+    const hasUndefinedStrings = verses.some(v => v === 'undefined' || v.trim() === 'undefined')
+    if (hasUndefinedStrings) {
+      console.error('[Sefaria] ❌ Found literal "undefined" strings in verses:', verses)
+      throw new Error('שגיאה בעיבוד הטקסט - נתונים לא תקינים')
+    }
+
+    console.log(`[Sefaria] ✅ Successfully parsed ${verses.length} verses`)
+    return verses
   }
 
   /**

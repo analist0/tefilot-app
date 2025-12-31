@@ -2,14 +2,17 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, Search, X, BookOpen, Sparkles, ScrollText, Star, Heart, Lightbulb } from "lucide-react"
+import { motion } from "framer-motion"
+import { Menu, Search, X, BookOpen, Sparkles, ScrollText, Star, Heart, Lightbulb, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { SearchDialog } from "@/components/shared/search-dialog"
 import { UserMenu } from "@/components/auth/user-menu"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 
 const navLinks = [
   { href: "/tehilim", label: "תהילים", icon: BookOpen },
+  { href: "/stats", label: "הסטטיסטיקות שלי", icon: BarChart3 },
   { href: "/category/parasha", label: "פרשות השבוע", icon: ScrollText },
   { href: "/category/kabbalah", label: "קבלה", icon: Sparkles },
   { href: "/category/segulot", label: "סגולות", icon: Star },
@@ -22,7 +25,12 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+      className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm"
+    >
       <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
         {/* Mobile Menu - Left side */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -92,43 +100,63 @@ export function Header() {
         </Button>
 
         {/* Logo - Center on mobile, right on desktop */}
-        <Link href="/" className="flex items-center gap-2 lg:order-first">
-          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+        <Link href="/" className="flex items-center gap-2 lg:order-first group">
+          <motion.div
+            whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+            transition={{ duration: 0.5 }}
+            className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:from-primary/30 group-hover:to-purple-500/30 transition-all"
+          >
             <BookOpen className="h-5 w-5 text-primary" />
-          </div>
-          <span className="text-lg sm:text-xl font-bold font-serif text-primary">אור הישרה</span>
+          </motion.div>
+          <span className="text-lg sm:text-xl font-bold font-serif bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            אור הישרה
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
-            >
-              {link.label}
-            </Link>
+            <motion.div key={link.href} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href={link.href}
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all rounded-lg hover:bg-primary/10 hover:shadow-sm relative group"
+              >
+                <span className="relative z-10">{link.label}</span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  initial={false}
+                />
+              </Link>
+            </motion.div>
           ))}
         </nav>
 
-        {/* Desktop Right Side - Search & User */}
+        {/* Desktop Right Side - Search, Theme & User */}
         <div className="hidden lg:flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
-            <Search className="h-5 w-5" />
-            <span className="sr-only">חיפוש</span>
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearchOpen(true)}
+              className="hover:bg-primary/10 hover:text-primary transition-all hover:shadow-md"
+            >
+              <Search className="h-5 w-5" />
+              <span className="sr-only">חיפוש</span>
+            </Button>
+          </motion.div>
 
+          <ThemeToggle />
           <UserMenu />
         </div>
 
-        {/* Mobile User Menu */}
-        <div className="lg:hidden">
+        {/* Mobile Theme & User Menu */}
+        <div className="lg:hidden flex items-center gap-1">
+          <ThemeToggle />
           <UserMenu />
         </div>
       </div>
 
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
-    </header>
+    </motion.header>
   )
 }

@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getCachedText } from "@/lib/reader/text-cache"
 import { sefaria } from "@/lib/sefaria/client"
 import {
   BookOpen,
@@ -16,7 +17,11 @@ import {
   Home,
   Loader2,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  HardDrive,
+  Database,
+  Cloud,
+  Wifi
 } from "lucide-react"
 
 interface TefilaData {
@@ -25,6 +30,8 @@ interface TefilaData {
   verses: string[]
   ref: string
 }
+
+type CacheSource = "memory" | "localStorage" | "supabase" | "api" | null
 
 function ReaderContent() {
   const searchParams = useSearchParams()
@@ -35,6 +42,7 @@ function ReaderContent() {
   const [tefilaData, setTefilaData] = useState<TefilaData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [cacheSource, setCacheSource] = useState<CacheSource>(null)
 
   useEffect(() => {
     async function loadText() {
@@ -46,21 +54,39 @@ function ReaderContent() {
 
       setLoading(true)
       setError(null)
+      setCacheSource(null)
 
       try {
-        console.log(`[Reader] Fetching: ${ref}`)
-        const response = await sefaria.fetchText(ref)
+        console.log(`[Reader] Loading: ${ref}`)
+        const startTime = Date.now()
 
-        // Parse Hebrew text
-        const verses = sefaria.parseHebrewText(response)
+        // Use 3-layer caching system
+        const verses = await getCachedText(ref)
+
+        const loadTime = Date.now() - startTime
+        console.log(`[Reader] Loaded in ${loadTime}ms`)
+
+        // Detect cache source based on load time
+        if (loadTime < 10) {
+          setCacheSource("memory")
+        } else if (loadTime < 100) {
+          setCacheSource("localStorage")
+        } else if (loadTime < 1000) {
+          setCacheSource("supabase")
+        } else {
+          setCacheSource("api")
+        }
 
         if (!verses || verses.length === 0) {
           throw new Error("לא נמצא טקסט עבור הפנייה זו")
         }
 
+        // Fetch metadata separately for title display
+        const metadata = await sefaria.fetchText(ref).catch(() => null)
+
         setTefilaData({
-          title: response.book || title,
-          heTitle: response.heTitle || title,
+          title: metadata?.book || title,
+          heTitle: metadata?.heTitle || title,
           verses,
           ref,
         })
@@ -184,6 +210,36 @@ function ReaderContent() {
     return null
   }
 
+  const getCacheIcon = () => {
+    switch (cacheSource) {
+      case "memory":
+        return <HardDrive className="h-3.5 w-3.5 text-green-600" />
+      case "localStorage":
+        return <Database className="h-3.5 w-3.5 text-blue-600" />
+      case "supabase":
+        return <Cloud className="h-3.5 w-3.5 text-purple-600" />
+      case "api":
+        return <Wifi className="h-3.5 w-3.5 text-orange-600" />
+      default:
+        return null
+    }
+  }
+
+  const getCacheLabel = () => {
+    switch (cacheSource) {
+      case "memory":
+        return "זיכרון מהיר"
+      case "localStorage":
+        return "קאש מקומי"
+      case "supabase":
+        return "מאגר נתונים"
+      case "api":
+        return "נטען מהשרת"
+      default:
+        return ""
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -193,6 +249,16 @@ function ReaderContent() {
       dir="rtl"
     >
       <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Cache indicator */}
+        {cacheSource && (
+          <div className="mb-4 flex justify-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/30 text-xs font-medium">
+              {getCacheIcon()}
+              <span>{getCacheLabel()}</span>
+            </div>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={tefilaData.ref}

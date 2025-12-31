@@ -97,7 +97,7 @@ export function UserMenu() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
       if (!mounted) return
 
       if (event === "SIGNED_OUT") {

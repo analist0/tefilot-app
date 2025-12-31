@@ -19,6 +19,8 @@ export default function ContentSettingsPage() {
     tefilot: true,
     halacha: true,
     sefarim: true,
+    zohar: true,
+    etz_chaim: true,
   })
 
   const [saved, setSaved] = useState(false)
@@ -67,13 +69,13 @@ export default function ContentSettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">
-            <Button onClick={() => setSettings({ tehilim: true, tanakh: true, talmud: true, tefilot: true, halacha: true, sefarim: true })}>
+            <Button onClick={() => setSettings({ tehilim: true, tanakh: true, talmud: true, tefilot: true, halacha: true, sefarim: true, zohar: true, etz_chaim: true })}>
               הפעל הכל
             </Button>
-            <Button variant="outline" onClick={() => setSettings({ tehilim: true, tanakh: false, talmud: false, tefilot: false, halacha: false, sefarim: false })}>
+            <Button variant="outline" onClick={() => setSettings({ tehilim: true, tanakh: false, talmud: false, tefilot: false, halacha: false, sefarim: false, zohar: false, etz_chaim: false })}>
               רק תהילים
             </Button>
-            <Button variant="outline" onClick={() => setSettings({ tehilim: false, tanakh: false, talmud: false, tefilot: false, halacha: false, sefarim: false })}>
+            <Button variant="outline" onClick={() => setSettings({ tehilim: false, tanakh: false, talmud: false, tefilot: false, halacha: false, sefarim: false, zohar: false, etz_chaim: false })}>
               השבת הכל
             </Button>
           </div>

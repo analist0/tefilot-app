@@ -3,24 +3,11 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { ArticlesGrid } from "@/components/articles/articles-grid"
 import { CategoryFilter } from "@/components/articles/category-filter"
+import { ArticleListSkeleton } from "@/components/shared/article-skeleton"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface ArticlesPageProps {
   searchParams: Promise<{ category?: string }>
-}
-
-function ArticlesSkeleton() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(9)].map((_, i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="h-48 w-full rounded-lg" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-full" />
-        </div>
-      ))}
-    </div>
-  )
 }
 
 export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
@@ -41,7 +28,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
             <CategoryFilter selectedCategory={categorySlug} />
           </Suspense>
 
-          <Suspense fallback={<ArticlesSkeleton />}>
+          <Suspense fallback={<ArticleListSkeleton count={9} />}>
             <ArticlesGrid categorySlug={categorySlug} />
           </Suspense>
         </div>

@@ -4,7 +4,7 @@ import { getCategories } from "@/lib/queries"
 import { Card, CardContent } from "@/components/ui/card"
 import { BookOpen, Heart, Sparkles, Star, Target, Flame } from "lucide-react"
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   BookOpen,
   Heart,
   Sparkles,

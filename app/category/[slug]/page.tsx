@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { BookOpen, Heart, Sparkles, Star, Target, Flame } from "lucide-react"
 import type { Metadata } from "next"
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   BookOpen,
   Heart,
   Sparkles,
