@@ -2,6 +2,9 @@
 
 import type React from "react"
 import { useState } from "react"
+
+// Force dynamic rendering to prevent build-time errors with Supabase
+export const dynamic = 'force-dynamic'
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, UserPlus, BookOpen, Loader2, Check } from "lucide-react"
