@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { ChapterReader } from "@/components/tehilim/chapter-reader"
+import { FloatingActionButton } from "@/components/shared/floating-action-button"
 import { hebrewNumber } from "@/lib/tehilim/parse"
 
 interface PageProps {
@@ -47,6 +48,7 @@ export default async function TehilimChapterPage({ params }: PageProps) {
       </main>
 
       <Footer />
+      <FloatingActionButton />
     </div>
   )
 }

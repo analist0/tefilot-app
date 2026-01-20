@@ -6,6 +6,9 @@ import { ArticleContent } from "@/components/articles/article-content"
 import { RelatedArticles } from "@/components/articles/related-articles"
 import { CommentsSection } from "@/components/comments/comments-section"
 import { StarRating } from "@/components/ratings/star-rating"
+import { ShareButton } from "@/components/shared/share-button"
+import { FloatingActionButton } from "@/components/shared/floating-action-button"
+import { ArticleContentSkeleton } from "@/components/shared/article-content-skeleton"
 import { JsonLd } from "@/components/seo/json-ld"
 import { getArticleBySlug } from "@/lib/queries"
 import { generateArticleJsonLd, generateBreadcrumbJsonLd } from "@/lib/seo"
@@ -105,12 +108,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <main className="flex-1">
         <ArticleContent article={article} />
 
-        <div className="container px-4 max-w-3xl mx-auto">
-          <StarRating
-            articleId={article.id}
-            currentRating={article.average_rating}
-            ratingsCount={article.ratings_count}
-          />
+        <div className="container px-4 max-w-3xl mx-auto space-y-6">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <StarRating
+              articleId={article.id}
+              currentRating={article.average_rating}
+              ratingsCount={article.ratings_count}
+            />
+            <ShareButton
+              title={article.title}
+              text={article.excerpt || article.title}
+              url={`${SITE_URL}/articles/${article.slug}`}
+              size="default"
+              variant="outline"
+            />
+          </div>
         </div>
 
         <Suspense fallback={<Skeleton className="h-64 w-full" />}>
@@ -125,6 +137,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <Suspense fallback={<div className="h-16 border-t" />}>
         <Footer />
       </Suspense>
+
+      <FloatingActionButton />
     </div>
   )
 }

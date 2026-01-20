@@ -20,7 +20,7 @@ const categorySchema = z.object({
   description: z.string().optional(),
   icon: z.string().optional(),
   color: z.string().optional(),
-  order_index: z.number().default(0),
+  order_index: z.number(),
 })
 
 type CategoryFormData = z.infer<typeof categorySchema>
